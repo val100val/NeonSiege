@@ -1,0 +1,44 @@
+name: Build Mac DMG
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build NeonSiegeMac (Release)
+        run: |
+          xcodebuild -project NeonSiege.xcodeproj \
+                     -target NeonSiegeMac \
+                     -configuration Release \
+                     SYMROOT="$PWD/build" \
+                     CODE_SIGN_IDENTITY="-" \
+                     build
+
+      - name: Package DMG
+        run: |
+          mkdir -p dmg_staging
+          cp -R build/Release/NeonSiegeMac.app dmg_staging/NeonSiege.app
+          ln -s /Applications dmg_staging/Applications
+          hdiutil create -volname "NeonSiege" -srcfolder dmg_staging -ov -format UDZO NeonSiege.dmg
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NeonSiege-dmg
+          path: NeonSiege.dmg
+
+      - name: Publish release with DMG
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.3
+          name: NeonSiege v1.3
+          files: NeonSiege.dmg
