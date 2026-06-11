@@ -71,14 +71,14 @@ func neonRect(size: CGSize, corner: CGFloat = 8, color: SKColor, glow: CGFloat =
 }
 
 func hexagonPath(radius: CGFloat) -> CGPath {
-    let path = UIBezierPath()
+    let path = CGMutablePath()
     for i in 0..<6 {
         let angle = CGFloat(i) * .pi / 3 + .pi / 6
         let point = CGPoint(x: cos(angle) * radius, y: sin(angle) * radius)
         if i == 0 { path.move(to: point) } else { path.addLine(to: point) }
     }
-    path.close()
-    return path.cgPath
+    path.closeSubpath()
+    return path
 }
 
 extension CGPoint {
