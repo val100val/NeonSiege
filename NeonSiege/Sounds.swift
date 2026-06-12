@@ -18,6 +18,10 @@ enum SFX: String, CaseIterable {
     case win = "sfx_win.wav"
     case lose = "sfx_lose.wav"
     case tap = "sfx_tap.wav"
+    case flak = "sfx_flak.wav"
+    case wunder = "sfx_wunder.wav"
+    case voiceWin = "voice_win.wav"
+    case voiceLose = "voice_lose.wav"
 }
 
 /// Central sound manager: low-latency SFX via SKAction, looping music via AVAudioPlayer.
@@ -58,6 +62,8 @@ final class Sound {
         switch sfx {
         case .pulse: return 0.08
         case .cryo, .arc, .rail: return 0.10
+        case .flak: return 0.12
+        case .wunder: return 0.30
         case .die: return 0.06
         case .teleport: return 0.15
         default: return 0.02

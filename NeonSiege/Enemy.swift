@@ -1,7 +1,7 @@
 import SpriteKit
 
 enum EnemyType: CaseIterable {
-    case drone, sprinter, swarm, tank, phantom, boss
+    case drone, sprinter, swarm, tank, phantom, boss, juggernaut, colossus, omega
 
     var baseHP: Double {
         switch self {
@@ -11,6 +11,16 @@ enum EnemyType: CaseIterable {
         case .tank: return 130
         case .phantom: return 48
         case .boss: return 650
+        case .juggernaut: return 1500
+        case .colossus: return 2800
+        case .omega: return 6000
+        }
+    }
+
+    var isBoss: Bool {
+        switch self {
+        case .boss, .juggernaut, .colossus, .omega: return true
+        default: return false
         }
     }
 
@@ -23,6 +33,9 @@ enum EnemyType: CaseIterable {
         case .tank: return 0.9
         case .phantom: return 1.8
         case .boss: return 0.7
+        case .juggernaut: return 0.55
+        case .colossus: return 0.5
+        case .omega: return 0.42
         }
     }
 
@@ -34,6 +47,9 @@ enum EnemyType: CaseIterable {
         case .tank: return 28
         case .phantom: return 22
         case .boss: return 120
+        case .juggernaut: return 260
+        case .colossus: return 420
+        case .omega: return 1000
         }
     }
 
@@ -45,6 +61,9 @@ enum EnemyType: CaseIterable {
         case .tank: return 12
         case .phantom: return 9
         case .boss: return 16
+        case .juggernaut: return 19
+        case .colossus: return 22
+        case .omega: return 26
         }
     }
 
@@ -56,6 +75,9 @@ enum EnemyType: CaseIterable {
         case .tank: return Theme.red
         case .phantom: return Theme.violet
         case .boss: return Theme.magenta
+        case .juggernaut: return Theme.red
+        case .colossus: return Theme.amber
+        case .omega: return SKColor(red: 1.0, green: 0.25, blue: 0.25, alpha: 1)
         }
     }
 
@@ -67,6 +89,9 @@ enum EnemyType: CaseIterable {
         case .tank: return "Bulwark"
         case .phantom: return "Phantom"
         case .boss: return "Overload"
+        case .juggernaut: return "Juggernaut"
+        case .colossus: return "Colossus"
+        case .omega: return "OMEGA PRIME"
         }
     }
 }
@@ -123,13 +148,22 @@ final class Enemy: SKNode {
         addChild(hpBarFill)
         zPosition = 50
 
-        if type == .boss {
+        if type.isBoss {
             let ring = SKShapeNode(circleOfRadius: type.radius + 5)
             ring.strokeColor = type.color.withAlphaComponent(0.6)
             ring.lineWidth = 1.5
             ring.fillColor = .clear
             addChild(ring)
             ring.run(.repeatForever(.rotate(byAngle: .pi * 2, duration: 3)))
+        }
+        if type == .omega {
+            let outerRing = SKShapeNode(circleOfRadius: type.radius + 11)
+            outerRing.strokeColor = SKColor.white.withAlphaComponent(0.5)
+            outerRing.lineWidth = 1
+            outerRing.glowWidth = 6
+            outerRing.fillColor = .clear
+            addChild(outerRing)
+            outerRing.run(.repeatForever(.rotate(byAngle: -.pi * 2, duration: 2)))
         }
         let pulse = SKAction.sequence([
             .scale(to: 1.08, duration: 0.45),
@@ -152,7 +186,8 @@ final class Enemy: SKNode {
     }
 
     func applySlow(factor: CGFloat, duration: TimeInterval, now: TimeInterval) {
-        slowFactor = factor
+        // OMEGA PRIME shrugs off most of the chill.
+        slowFactor = type == .omega ? max(factor, 0.85) : factor
         slowUntil = now + duration
         body.strokeColor = Theme.ice
     }

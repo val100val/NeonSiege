@@ -1,7 +1,7 @@
 import SpriteKit
 
 enum TowerType: CaseIterable {
-    case pulse, cryo, arc, rail
+    case pulse, cryo, arc, rail, flak, wunder
 
     var name: String {
         switch self {
@@ -9,6 +9,8 @@ enum TowerType: CaseIterable {
         case .cryo: return "Cryo"
         case .arc: return "Arc"
         case .rail: return "Rail"
+        case .flak: return "Flak"
+        case .wunder: return "Wunder"
         }
     }
 
@@ -18,6 +20,8 @@ enum TowerType: CaseIterable {
         case .cryo: return 70
         case .arc: return 110
         case .rail: return 160
+        case .flak: return 210
+        case .wunder: return 666
         }
     }
 
@@ -27,6 +31,8 @@ enum TowerType: CaseIterable {
         case .cryo: return 4
         case .arc: return 16
         case .rail: return 46
+        case .flak: return 26
+        case .wunder: return 80
         }
     }
 
@@ -37,6 +43,8 @@ enum TowerType: CaseIterable {
         case .cryo: return 2.2
         case .arc: return 2.6
         case .rail: return 4.5
+        case .flak: return 2.9
+        case .wunder: return 3.4
         }
     }
 
@@ -46,6 +54,8 @@ enum TowerType: CaseIterable {
         case .cryo: return 0.75
         case .arc: return 1.05
         case .rail: return 1.7
+        case .flak: return 1.35
+        case .wunder: return 2.6
         }
     }
 
@@ -55,6 +65,8 @@ enum TowerType: CaseIterable {
         case .cryo: return Theme.ice
         case .arc: return Theme.magenta
         case .rail: return Theme.amber
+        case .flak: return Theme.lime
+        case .wunder: return SKColor.white
         }
     }
 
@@ -64,6 +76,8 @@ enum TowerType: CaseIterable {
         case .cryo: return "Slows and chips enemies"
         case .arc: return "Chains up to 3 targets"
         case .rail: return "Piercing long-range shot"
+        case .flak: return "Explosive splash damage"
+        case .wunder: return "WUNDERWAFFE: nova hits ALL in range, even cloaked"
         }
     }
 }

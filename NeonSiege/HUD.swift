@@ -86,8 +86,9 @@ final class HUD: SKNode {
         addChild(bar)
 
         let types = TowerType.allCases
-        let buttonWidth: CGFloat = 132
-        let spacing: CGFloat = 12
+        let spacing: CGFloat = 10
+        // Six build buttons must fit any landscape width, phone or Mac.
+        let buttonWidth: CGFloat = min(132, (sceneSize.width - 32 - CGFloat(types.count - 1) * spacing) / CGFloat(types.count))
         let totalWidth = CGFloat(types.count) * buttonWidth + CGFloat(types.count - 1) * spacing
         var x = (sceneSize.width - totalWidth) / 2 + buttonWidth / 2
 
@@ -97,23 +98,26 @@ final class HUD: SKNode {
             button.name = "build_\(type.name.lowercased())"
             addChild(button)
 
-            let glyph = SKShapeNode(path: hexagonPath(radius: 12))
+            let compact = buttonWidth < 116
+            let glyphRadius: CGFloat = compact ? 9 : 12
+            let glyph = SKShapeNode(path: hexagonPath(radius: glyphRadius))
             glyph.strokeColor = type.color
             glyph.fillColor = type.color.withAlphaComponent(0.3)
             glyph.glowWidth = 3
-            glyph.position = CGPoint(x: -buttonWidth / 2 + 22, y: 0)
+            glyph.position = CGPoint(x: -buttonWidth / 2 + (compact ? 16 : 22), y: 0)
             glyph.name = button.name
             button.addChild(glyph)
 
-            let nameLabel = makeLabel(type.name, size: 14, color: .white)
+            let textX = -buttonWidth / 2 + (compact ? 29 : 40)
+            let nameLabel = makeLabel(type.name, size: compact ? 11 : 14, color: .white)
             nameLabel.horizontalAlignmentMode = .left
-            nameLabel.position = CGPoint(x: -buttonWidth / 2 + 40, y: 9)
+            nameLabel.position = CGPoint(x: textX, y: compact ? 7 : 9)
             nameLabel.name = button.name
             button.addChild(nameLabel)
 
-            let costLabel = makeLabel("$\(type.cost)", size: 12, color: Theme.amber, font: Theme.font)
+            let costLabel = makeLabel("$\(type.cost)", size: compact ? 10 : 12, color: Theme.amber, font: Theme.font)
             costLabel.horizontalAlignmentMode = .left
-            costLabel.position = CGPoint(x: -buttonWidth / 2 + 40, y: -11)
+            costLabel.position = CGPoint(x: textX, y: compact ? -9 : -11)
             costLabel.name = button.name
             button.addChild(costLabel)
 

@@ -333,7 +333,12 @@ final class GameScene: SKScene {
 
     private func handleKill(_ enemy: Enemy) {
         credits += enemy.type.reward
-        Effects.burst(at: enemy.position, color: enemy.type.color, count: enemy.type == .boss ? 18 : 8, in: entityLayer)
+        Effects.burst(at: enemy.position, color: enemy.type.color, count: enemy.type.isBoss ? 18 : 8, in: entityLayer)
+        // A dying Colossus cracks open into a swarm. Stay sharp.
+        if enemy.type == .colossus && !gameEnded {
+            for _ in 0..<6 { spawnEnemy(type: .swarm, at: enemy.currentCell) }
+            Effects.floatText("COLOSSUS SPLIT!", at: enemy.position, color: Theme.amber, size: 14, in: entityLayer)
+        }
         Effects.floatText("+$\(enemy.type.reward)", at: enemy.position, color: Theme.amber, in: entityLayer)
         if enemy.carryingShard {
             Effects.shardReturn(from: enemy.position, to: cellCenter(level.core), in: entityLayer) { [weak self] in
@@ -351,9 +356,10 @@ final class GameScene: SKScene {
 
     private func pickTarget(for tower: Tower) -> Enemy? {
         let rangePoints = tower.range * cellSize
+        let seesCloaked = tower.type == .wunder
         var best: Enemy?
         var bestScore = Double.greatestFiniteMagnitude
-        for enemy in enemies where !enemy.cloaked && !enemy.isDead {
+        for enemy in enemies where (seesCloaked || !enemy.cloaked) && !enemy.isDead {
             let distance = tower.position.distance(to: enemy.position)
             if distance > rangePoints { continue }
             var score = Double(grid.distanceToCore(from: enemy.currentCell) == Int.max
@@ -406,6 +412,33 @@ final class GameScene: SKScene {
                     enemy.applyDamage(tower.damage)
                 }
             }
+        case .flak:
+            Sound.shared.play(.flak, on: self)
+            Effects.beam(from: tower.position, to: target.position, color: Theme.lime, width: 3, in: entityLayer)
+            Effects.burst(at: target.position, color: Theme.lime, count: 10, in: entityLayer)
+            Effects.ring(at: target.position, radius: cellSize * 1.25, color: Theme.lime, in: entityLayer)
+            let splashRadius = cellSize * 1.25
+            for enemy in enemies where !enemy.cloaked && !enemy.isDead {
+                let d = enemy.position.distance(to: target.position)
+                if d <= splashRadius {
+                    // Full damage at the center, 50% at the edge of the blast.
+                    let falloff = 1.0 - 0.5 * Double(d / splashRadius)
+                    enemy.applyDamage(tower.damage * falloff)
+                }
+            }
+        case .wunder:
+            Sound.shared.play(.wunder, on: self)
+            // The Wunderwaffe unleashes a nova that strikes EVERYTHING in range,
+            // cloaked phantoms included.
+            Effects.ring(at: tower.position, radius: tower.range * cellSize, color: .white, in: entityLayer)
+            Effects.burst(at: tower.position, color: .white, count: 16, in: entityLayer)
+            let rangePoints = tower.range * cellSize
+            for enemy in enemies where !enemy.isDead {
+                if enemy.position.distance(to: tower.position) <= rangePoints {
+                    Effects.beam(from: tower.position, to: enemy.position, color: .white, width: 2.5, in: entityLayer)
+                    enemy.applyDamage(tower.damage)
+                }
+            }
         }
     }
 
@@ -440,6 +473,8 @@ final class GameScene: SKScene {
         case "2": _ = handleAction("build_cryo")
         case "3": _ = handleAction("build_arc")
         case "4": _ = handleAction("build_rail")
+        case "5": _ = handleAction("build_flak")
+        case "6": _ = handleAction("build_wunder")
         case "f": _ = handleAction("speed")
         case "w": _ = handleAction("callwave")
         case " ", "p": _ = handleAction("pause")
@@ -479,6 +514,8 @@ final class GameScene: SKScene {
         case "build_cryo": selectBuild(.cryo); return true
         case "build_arc": selectBuild(.arc); return true
         case "build_rail": selectBuild(.rail); return true
+        case "build_flak": selectBuild(.flak); return true
+        case "build_wunder": selectBuild(.wunder); return true
         case "speed":
             gameSpeed = gameSpeed == 1 ? 2 : 1
             hud.setSpeed(Int(gameSpeed))
@@ -710,6 +747,10 @@ final class GameScene: SKScene {
             let overlay = makeOverlay(title: "SECTOR SECURED", subtitle: starsText, titleColor: Theme.lime, buttons: buttons)
             uiLayer.addChild(overlay)
             Sound.shared.play(.win, on: self)
+            run(.sequence([.wait(forDuration: 0.5), .run { [weak self] in
+                guard let self = self else { return }
+                Sound.shared.play(.voiceWin, on: self)
+            }]))
             Haptics.success()
         } else {
             let overlay = makeOverlay(title: "CORES LOST", titleColor: Theme.red, buttons: [
@@ -718,6 +759,10 @@ final class GameScene: SKScene {
             ])
             uiLayer.addChild(overlay)
             Sound.shared.play(.lose, on: self)
+            run(.sequence([.wait(forDuration: 0.5), .run { [weak self] in
+                guard let self = self else { return }
+                Sound.shared.play(.voiceLose, on: self)
+            }]))
             Haptics.error()
         }
     }

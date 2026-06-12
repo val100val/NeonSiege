@@ -23,7 +23,7 @@ they escape.
 
 | Key | Action |
 | --- | ------ |
-| `1` – `4` | Select tower (Pulse / Cryo / Arc / Rail) |
+| `1` – `6` | Select tower (Pulse / Cryo / Arc / Rail / Flak / Wunderwaffe) |
 | `Space` or `P` | Pause / resume |
 | `Esc` | Close tower popup, or pause |
 | `F` | Toggle 2x speed |
@@ -74,31 +74,54 @@ your Mac — but this script makes it one command.)
 | Cryo  | $70  | Slows enemies + chip damage |
 | Arc   | $110 | Chains between up to 3 enemies |
 | Rail  | $160 | Long-range piercing shot |
+| Flak  | $210 | Explosive splash damage |
+| **Wunderwaffe** | $666 | Nova strikes EVERYTHING in range — even cloaked Phantoms |
+
+Towers sell back for 70% of everything invested. Full stats live in the
+in-game **HELP** screen (main menu, bottom-left).
 
 ### Enemies
 
 Drones, fast Sprinters, swarming Swarmlings, armored Bulwarks, cloaking
 Phantoms (untargetable while cloaked!) and the **Overload** boss every 5th wave.
 
-## 10 levels
+New in v2.0 — the heavyweights:
 
-Boot Camp, Twin Streams, The Spiral, Crossfire, Glitch Gate, The Gauntlet,
-Parallax, Reactor Ring, Vortex Run and the finale: **Final Protocol** —
-three spawn gates, a glitch portal and 15 waves.
+- **Juggernaut** — an armored giant boss (levels 11+, every 5th wave).
+- **Colossus** — a massive boss that **splits into a swarm when killed**.
+- **OMEGA PRIME** — the superboss. Resists slows, takes a small army to stop,
+  and waits at the end of level 20.
+
+## 20 levels
+
+Campaign I: Boot Camp, Twin Streams, The Spiral, Crossfire, Glitch Gate,
+The Gauntlet, Parallax, Reactor Ring, Vortex Run, **Final Protocol**.
+
+Campaign II (v2.0): The Switchback, Diamond Field, The Hive, Mirror Maze,
+Pinwheel, Catacombs, Twin Vortex, The Crucible, Labyrinth of Echoes and the
+grand finale — **Omega Citadel**: a concentric fortress, four armies, a
+treacherous portal and OMEGA PRIME itself on the final wave.
+
+Every next level is harder than the last: enemy HP scales with level number,
+waves get denser, and Campaign II layouts (staggered ribs, crystal diamonds,
+kill-boxes, portal mazes) demand real maze engineering.
 
 Every level starts in a **planning phase**: no timer, study the layout,
 pre-build your maze, then tap **LAUNCH WAVE 1** when you're ready.
 
-### Levels
-
-1. **Boot Camp** — open field, pure maze-building.
-2. **Twin Streams** — two spawn gates, one central core.
-3. **The Spiral** — a long pre-built lane winding to the core.
-4. **Crossfire** — attacked from all four corners.
-5. **Glitch Gate** — portals teleport enemies across the map.
-
 Earn up to ★★★ per level by keeping your shards safe. Beating a level unlocks
 the next.
+
+### Robo-voice
+
+Win or lose a level and a Russian robo-voice will let you know exactly how it
+feels about your performance. 🤖
+
+### Help
+
+The main menu has a **HELP** button (bottom-left) with the full field manual:
+rules, every enemy's HP/speed/bounty, and every weapon's buy/sell price and
+damage.
 
 ---
 Built with Swift + SpriteKit. No external assets or dependencies — all visuals

@@ -43,6 +43,13 @@ final class MenuScene: SKScene {
         addChild(sound)
         soundLabel = sound
 
+        let help = makeLabel("HELP", size: 12, color: Theme.amber)
+        help.horizontalAlignmentMode = .left
+        help.position = CGPoint(x: 24, y: 24)
+        help.zPosition = 10
+        help.name = "menu_help"
+        addChild(help)
+
         Sound.shared.startMusic()
     }
 
@@ -85,53 +92,57 @@ final class MenuScene: SKScene {
     private func drawLevelCards() {
         let levels = LevelLibrary.all
         let unlocked = Progress.unlockedLevel
-        let perRow = 5
-        let spacing: CGFloat = 14
-        let cardWidth: CGFloat = min(128, (size.width - 60 - CGFloat(perRow - 1) * spacing) / CGFloat(perRow))
-        // Fit two rows between title block and footer on any screen height.
-        let cardHeight: CGFloat = min(124, (size.height - 170 - spacing) / 2)
+        let perRow = 7
+        let rows = (levels.count + perRow - 1) / perRow
+        let spacing: CGFloat = 10
+        let cardWidth: CGFloat = min(128, (size.width - 50 - CGFloat(perRow - 1) * spacing) / CGFloat(perRow))
+        // Fit all rows between title block and footer on any screen height.
+        let cardHeight: CGFloat = min(108, (size.height - 160 - CGFloat(rows - 1) * spacing) / CGFloat(rows))
+        let k = cardHeight / 108 // scale factor for card internals
         let totalWidth = CGFloat(perRow) * cardWidth + CGFloat(perRow - 1) * spacing
         let startX = (size.width - totalWidth) / 2 + cardWidth / 2
-        let centerY = size.height / 2 - 28
+        let gridHeight = CGFloat(rows) * cardHeight + CGFloat(rows - 1) * spacing
+        let topY = size.height / 2 - 26 + gridHeight / 2 - cardHeight / 2
 
         for (i, level) in levels.enumerated() {
             let row = i / perRow
             let col = i % perRow
             let x = startX + CGFloat(col) * (cardWidth + spacing)
-            let y = centerY + (row == 0 ? (cardHeight + spacing) / 2 : -(cardHeight + spacing) / 2)
+            let y = topY - CGFloat(row) * (cardHeight + spacing)
             let isUnlocked = level.id <= unlocked
-            let color: SKColor = isUnlocked ? Theme.cyan : Theme.dim
-            let card = neonRect(size: CGSize(width: cardWidth, height: cardHeight), corner: 12, color: color, glow: isUnlocked ? 4 : 1, fillAlpha: 0.10)
+            let isFinale = level.id == levels.count
+            let color: SKColor = isUnlocked ? (isFinale ? Theme.red : Theme.cyan) : Theme.dim
+            let card = neonRect(size: CGSize(width: cardWidth, height: cardHeight), corner: 10, color: color, glow: isUnlocked ? 4 : 1, fillAlpha: 0.10)
             card.position = CGPoint(x: x, y: y)
             card.zPosition = 10
             if isUnlocked { card.name = "level_\(level.id)" }
             addChild(card)
 
-            let number = makeLabel("\(level.id)", size: 24, color: color, font: Theme.titleFont)
-            number.position = CGPoint(x: 0, y: cardHeight / 2 - 28)
+            let number = makeLabel("\(level.id)", size: max(13, 21 * k), color: color, font: Theme.titleFont)
+            number.position = CGPoint(x: 0, y: cardHeight / 2 - max(15, 24 * k))
             number.name = card.name
             card.addChild(number)
 
-            let name = makeLabel(level.name.uppercased(), size: 11, color: isUnlocked ? .white : Theme.dim)
-            name.position = CGPoint(x: 0, y: 0)
+            let name = makeLabel(level.name.uppercased(), size: max(7, 10 * k), color: isUnlocked ? .white : Theme.dim)
+            name.position = CGPoint(x: 0, y: -2 * k)
             name.name = card.name
             card.addChild(name)
 
-            let info = makeLabel("\(level.waves.count) WAVES", size: 9, color: Theme.dim, font: Theme.font)
-            info.position = CGPoint(x: 0, y: -14)
+            let info = makeLabel("\(level.waves.count) WAVES", size: max(6, 8 * k), color: Theme.dim, font: Theme.font)
+            info.position = CGPoint(x: 0, y: -2 * k - max(9, 12 * k))
             info.name = card.name
             card.addChild(info)
 
             if isUnlocked {
                 let stars = Progress.stars(for: level.id)
                 let starsText = stars > 0 ? String(repeating: "*", count: stars) : "-"
-                let starsLabel = makeLabel(starsText, size: 14, color: stars > 0 ? Theme.amber : Theme.dim)
-                starsLabel.position = CGPoint(x: 0, y: -cardHeight / 2 + 12)
+                let starsLabel = makeLabel(starsText, size: max(9, 12 * k), color: stars > 0 ? Theme.amber : Theme.dim)
+                starsLabel.position = CGPoint(x: 0, y: -cardHeight / 2 + max(8, 11 * k))
                 starsLabel.name = card.name
                 card.addChild(starsLabel)
             } else {
-                let lock = makeLabel("LOCKED", size: 10, color: Theme.dim)
-                lock.position = CGPoint(x: 0, y: -cardHeight / 2 + 12)
+                let lock = makeLabel("LOCKED", size: max(7, 9 * k), color: Theme.dim)
+                lock.position = CGPoint(x: 0, y: -cardHeight / 2 + max(8, 11 * k))
                 card.addChild(lock)
             }
         }
@@ -151,6 +162,12 @@ final class MenuScene: SKScene {
     private func handleTap(at point: CGPoint) {
         var node: SKNode? = atPoint(point)
         while let current = node {
+            if current.name == "menu_help" {
+                Sound.shared.play(.tap, on: self)
+                Haptics.tap()
+                view?.presentScene(HelpScene(size: size), transition: .fade(withDuration: 0.4))
+                return
+            }
             if current.name == "menu_sound" {
                 Sound.shared.toggle()
                 Sound.shared.play(.tap, on: self)
