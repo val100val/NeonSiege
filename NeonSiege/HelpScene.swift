@@ -14,8 +14,8 @@ final class HelpScene: SKScene {
     override func didMove(to view: SKView) {
         backgroundColor = Theme.background
 
-        let title = makeLabel("FIELD MANUAL", size: 28, color: Theme.cyan, font: Theme.titleFont)
-        title.position = CGPoint(x: size.width / 2, y: size.height - 40)
+        let title = makeLabel("FIELD MANUAL", size: 40, color: Theme.cyan, font: Theme.titleFont)
+        title.position = CGPoint(x: size.width / 2, y: size.height - 52)
         addChild(title)
 
         let columnWidth = size.width / 3
@@ -23,11 +23,11 @@ final class HelpScene: SKScene {
         drawEnemies(centerX: columnWidth * 1.5)
         drawWeapons(centerX: columnWidth * 2.5)
 
-        let back = neonRect(size: CGSize(width: 130, height: 32), corner: 8, color: Theme.lime, glow: 3, fillAlpha: 0.14)
-        back.position = CGPoint(x: size.width / 2, y: 28)
+        let back = neonRect(size: CGSize(width: 170, height: 44), corner: 10, color: Theme.lime, glow: 3, fillAlpha: 0.14)
+        back.position = CGPoint(x: size.width / 2, y: 40)
         back.name = "help_back"
         addChild(back)
-        let backLabel = makeLabel("BACK", size: 14, color: Theme.lime)
+        let backLabel = makeLabel("BACK", size: 18, color: Theme.lime)
         backLabel.name = "help_back"
         backLabel.position = back.position
         addChild(backLabel)
@@ -35,12 +35,14 @@ final class HelpScene: SKScene {
 
     // MARK: - Columns
 
-    private var topY: CGFloat { size.height - 78 }
-    private var lineGap: CGFloat { max(13, min(17, (size.height - 130) / 22)) }
-    private var bodySize: CGFloat { max(8.5, min(11, size.height / 60)) }
+    // Layout fills the whole scene height: the tallest column (ENEMIES) needs
+    // ~19.5 line-gaps between the column header and the BACK button.
+    private var topY: CGFloat { size.height - 104 }
+    private var lineGap: CGFloat { max(14, min(34, (size.height - 170) / 19.5)) }
+    private var bodySize: CGFloat { max(10, min(19, lineGap * 0.56)) }
 
     private func header(_ text: String, x: CGFloat, y: CGFloat, color: SKColor) {
-        let label = makeLabel(text, size: bodySize + 3, color: color, font: Theme.titleFont)
+        let label = makeLabel(text, size: bodySize + 6, color: color, font: Theme.titleFont)
         label.position = CGPoint(x: x, y: y)
         addChild(label)
     }
