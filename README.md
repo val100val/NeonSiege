@@ -102,9 +102,17 @@ Pinwheel, Catacombs, Twin Vortex, The Crucible, Labyrinth of Echoes and the
 grand finale — **Omega Citadel**: a concentric fortress, four armies, a
 treacherous portal and OMEGA PRIME itself on the final wave.
 
-Every next level is harder than the last: enemy HP scales with level number,
-waves get denser, and Campaign II layouts (staggered ribs, crystal diamonds,
-kill-boxes, portal mazes) demand real maze engineering.
+**v3.0 — real mazes.** Every level is now a hand-validated labyrinth on a
+high-resolution grid (up to 32×17 cells): inward **spirals** and concentric
+**ring fortresses**, long horizontal **gauntlets**, vertical **switchbacks**,
+staggered **diamond lattices** and twin **vortex chambers**. Each layout is
+BFS-checked to force a genuinely long, winding spawn→core path (the longest run
+over 200 cells) while still leaving open pockets so you can extend the maze with
+your own towers. Geometry is generated and validated by `tools/build_levels.py`.
+
+Every next level is harder than the last: enemy HP scales with level number and
+wave, waves get denser, and the back half throws Juggernauts, Colossi and
+OMEGA PRIME at you through the tightest mazes in the game.
 
 Every level starts in a **planning phase**: no timer, study the layout,
 pre-build your maze, then tap **LAUNCH WAVE 1** when you're ready.
